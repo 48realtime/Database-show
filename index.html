@@ -3,222 +3,440 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Realtime48s Database</title>
+    <title>Show Manager Pro - Admin & Persistence</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; }
-        .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .glass-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .admin-section { border-left: 4px solid #ef4444; }
+        .opt-membership { font-weight: bold; color: #2563eb; background-color: #eff6ff; }
+        input:focus, select:focus, textarea:focus { border-color: #3b82f6 !important; box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen">
-
-    <!-- Header / Navbar -->
-    <nav class="bg-white border-b border-slate-200 sticky top-0 z-50 px-6 py-4 flex justify-between items-center shadow-sm">
-        <div class="flex items-center gap-2">
-            <div class="bg-indigo-600 p-2 rounded-lg text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
-            </div>
-            <span class="font-extrabold text-xl tracking-tight italic">Realtime<span class="text-indigo-600">48s</span> DB</span>
+<body class="min-h-screen py-8 px-4">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-800 tracking-tight">Show Manager Realtime</h1>
+            <p class="text-gray-600 italic text-sm">Penyimpanan Otomatis Jam, Tanggal & Sandi per Show</p>
         </div>
-        <div class="hidden md:flex gap-6 text-sm font-semibold text-slate-500">
-            <a href="#database" class="hover:text-indigo-600 transition-colors">Arsip Database</a>
-            <a href="#integration" class="hover:text-indigo-600 transition-colors">Panduan Integrasi</a>
-        </div>
-    </nav>
 
-    <!-- Main Content -->
-    <main class="max-w-6xl mx-auto px-6 py-12">
-        
-        <!-- Welcome Banner -->
-        <header class="mb-12">
-            <h1 class="text-4xl font-extrabold text-slate-900 mb-2">Manajemen Link Pertunjukan</h1>
-            <p class="text-slate-500 font-medium">Database terpusat untuk link streaming teater JKT48.</p>
-        </header>
-
-        <!-- Database Section -->
-        <section id="database" class="mb-20">
-            <div class="flex items-center justify-between mb-8">
-                <h2 class="text-2xl font-bold flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
-                    Daftar Show Tersimpan Di Database
-                </h2>
-                <span id="data-count" class="bg-indigo-100 text-indigo-700 px-4 py-1 rounded-full text-xs font-bold"></span>
-            </div>
-
-            <!-- Grid Data -->
-            <div id="show-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Data akan dimuat via JS -->
-            </div>
-        </section>
-
-        <!-- Integration Panel (Dark Mode) -->
-        <section id="integration">
-            <div class="bg-slate-900 rounded-[2.5rem] p-8 md:p-12 text-white relative overflow-hidden shadow-2xl">
-                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                    <div>
-                        <div class="inline-flex items-center gap-2 bg-indigo-500/20 text-indigo-300 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest mb-6 border border-indigo-500/30">
-                            PANDUAN INTEGRASI DATA
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- LEFT COLUMN: ADMIN PANEL -->
+            <div class="space-y-6">
+                <div class="glass-card rounded-2xl p-6 shadow-xl admin-section">
+                    <h3 class="text-lg font-bold text-red-600 mb-4 flex items-center gap-2">
+                        🛡️ Panel Admin (Simpan Data)
+                    </h3>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nama Show</label>
+                            <input list="showList" id="adminShow" class="w-full p-2 text-sm border border-gray-200 rounded-lg outline-none bg-white" placeholder="Ketik atau pilih show...">
+                            <datalist id="showList">
+                                <option value="Seleksi PMDK">
+                                <option value="JKT48 Shcool">
+                                <option value="Andai Ku Bukan Idola">
+                                <option value="Z Vs Alpha">
+                                <option value="JKT48 Fight : Dream,PASSION,LOVE">
+                                <option value="Membership Show">
+                            </datalist>
                         </div>
-                        <h2 class="text-3xl font-bold mb-6">Bagi Website Lain</h2>
-                        <p class="text-slate-400 text-sm mb-8 leading-relaxed">
-                            Website lain dapat mengambil data link berdasarkan Nama Show dan Tanggal secara akurat dari struktur database ini.
-                        </p>
-                        
-                        <div class="space-y-4">
-                            <div class="flex items-center gap-4 text-sm bg-white/5 p-4 rounded-2xl border border-white/10">
-                                <div class="bg-green-500/20 text-green-400 p-2 rounded-lg">✓</div>
-                                <span>Struktur JSON siap pakai</span>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Tanggal Show</label>
+                                <input type="date" id="adminDate" class="w-full p-2 text-sm border border-gray-200 rounded-lg outline-none bg-white">
                             </div>
-                            <div class="flex items-center gap-4 text-sm bg-white/5 p-4 rounded-2xl border border-white/10">
-                                <div class="bg-green-500/20 text-green-400 p-2 rounded-lg">✓</div>
-                                <span>Mendukung multi-link per show</span>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Jam Show</label>
+                                <input type="text" id="adminTime" class="w-full p-2 text-sm border border-gray-200 rounded-lg outline-none bg-white" placeholder="19.00 WIB">
                             </div>
                         </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Sandi Replay</label>
+                            <input type="text" id="adminPass" class="w-full p-2 text-sm border border-gray-200 rounded-lg outline-none bg-white" placeholder="Sandi123">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Input Link (Baris Baru)</label>
+                            <textarea id="adminLinks" rows="4" class="w-full p-2 text-xs border border-gray-200 rounded-lg outline-none font-mono" placeholder="Paste link-link di sini..."></textarea>
+                        </div>
+                        <button 
+                            onclick="saveShowToDatabase()"
+                            class="w-full bg-red-600 hover:bg-red-700 text-white py-2 rounded-lg text-sm font-bold transition-all shadow-lg"
+                        >
+                            Simpan Ke Database
+                        </button>
                     </div>
 
-                    <div class="bg-slate-800/50 rounded-3xl p-6 border border-white/5">
-                        <div class="flex items-center gap-1.5 mb-4">
-                            <div class="w-2.5 h-2.5 rounded-full bg-red-500/40"></div>
-                            <div class="w-2.5 h-2.5 rounded-full bg-amber-500/40"></div>
-                            <div class="w-2.5 h-2.5 rounded-full bg-green-500/40"></div>
-                            <span class="ml-2 text-slate-500 text-[10px] font-mono uppercase">logic-example.json</span>
-                        </div>
-                        <pre class="text-indigo-200 text-[11px] leading-relaxed overflow-x-auto font-mono">
-{
-  "show": "Cara Meminum Ramune",
-  "tanggal": "2026-02-12",
-  "links": [
-    "https://play.realtime48s.my.id/#...",
-    "https://play.realtime48s.my.id/#..."
-  ]
-}
-                        </pre>
+                    <div class="mt-6 pt-4 border-t border-gray-100 space-y-2">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase">Manajemen Memori</p>
+                        <button 
+                            onclick="clearAllLinks()"
+                            class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg text-xs font-semibold transition-all border border-gray-200"
+                        >
+                            🗑️ Reset Semua Data
+                        </button>
                     </div>
                 </div>
-                <!-- Background decorative blur -->
-                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-indigo-600/20 rounded-full blur-[100px]"></div>
+
+                <div class="glass-card rounded-2xl p-6 shadow-md border border-gray-100">
+                    <h3 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                        📋 Antrian Link Aktif
+                    </h3>
+                    <div id="linkDatabaseView" class="text-[10px] font-mono text-gray-500 max-h-60 overflow-y-auto space-y-1">
+                    </div>
+                </div>
             </div>
-        </section>
-    </main>
 
-    <footer class="text-center py-12 text-slate-400 text-xs font-medium border-t border-slate-200 mt-20">
-        &copy; 2026 Realtime48s Database Management System.
-    </footer>
-
-    <!-- JavaScript Data & UI Logic -->
-    <script>
-        /**
-         * ==========================================
-         * ADMIN: EDIT DATA SHOW DI BAWAH INI
-         * ==========================================
-         */
-        const SHOW_DATABASE = [
-            {
-                nama: "Cara Meminum Ramune",
-                tanggal: "2026-02-12",
-                links: [
-                    "https://play.realtime48s.my.id/#2kyCqRYIjaqm4sfwDrss",
-                    "https://play.realtime48s.my.id/#2kyCqRYIjaqm4sfwDrkk"
-                ]
-            },
-            {
-                nama: "Pertaruhan Cinta",
-                tanggal: "2026-02-13",
-                links: [
-                    "https://play.realtime48s.my.id/#2kyCqRYIjaqm4sfwDjkl",
-                    "https://play.realtime48s.my.id/#2kyCqRYIjaqm4sfwDrsk"
-                ]
-            },
-            {
-                nama: "Sambil Menggandeng Erat Tanganku",
-                tanggal: "2026-02-14",
-                links: [
-                    "https://play.realtime48s.my.id/#jsisijnsiik22ndjj",
-                    "https://play.realtime48s.my.id/#jsidjd888nejisksn"
-                ]
-            },
-            {
-                nama: "Pajama Drive",
-                tanggal: "2026-02-15",
-                links: [
-                    "https://play.realtime48s.my.id/#pj1",
-                    "https://play.realtime48s.my.id/#pj2"
-                ]
-            }
-        ];
-
-        // Fungsi Memuat Data ke UI
-        function loadDatabase() {
-            const container = document.getElementById('show-list');
-            const counter = document.getElementById('data-count');
-            
-            counter.innerText = `${SHOW_DATABASE.length} Entri Database`;
-            container.innerHTML = '';
-
-            SHOW_DATABASE.forEach((data, index) => {
-                const dateObj = new Date(data.tanggal);
-                const options = { day: 'numeric', month: 'long', year: 'numeric' };
-                const formattedDate = dateObj.toLocaleDateString('id-ID', options);
-
-                // Buat Elemen Kartu
-                const card = document.createElement('div');
-                card.className = 'bg-white border border-slate-200 rounded-3xl overflow-hidden hover:border-indigo-400 transition-all hover:shadow-xl hover:shadow-indigo-50/50';
-                
-                // Judul dan Header Kartu
-                let linksHtml = '';
-                data.links.forEach((link, lIdx) => {
-                    linksHtml += `
-                        <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-100 hover:border-indigo-200 group transition-all">
-                            <div class="flex items-center gap-3 overflow-hidden">
-                                <span class="bg-indigo-600 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shrink-0">${lIdx + 1}</span>
-                                <span class="text-xs text-slate-500 truncate font-mono">${link}</span>
-                            </div>
-                            <div class="flex gap-2 shrink-0 ml-4">
-                                <button onclick="copyLink('${link}')" class="text-slate-400 hover:text-indigo-600 transition-colors" title="Salin Link">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-                                </button>
-                                <a href="${link}" target="_blank" class="text-slate-400 hover:text-indigo-600 transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                </a>
-                            </div>
+            <!-- MIDDLE COLUMN: FORM JADWAL -->
+            <div class="space-y-6">
+                <div class="glass-card rounded-2xl p-6 shadow-xl border border-blue-100">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">Form Jadwal</h3>
+                        <span id="linkCounter" class="text-xs font-bold bg-blue-100 text-blue-600 px-3 py-1 rounded-full">
+                            Sisa: 0
+                        </span>
+                    </div>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Pilih Show Terdaftar</label>
+                            <select id="inShow" onchange="syncDataFromSelection()" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                                <option value="">-- Pilih Show --</option>
+                            </select>
                         </div>
-                    `;
-                });
-
-                card.innerHTML = `
-                    <div class="p-6">
-                        <div class="flex justify-between items-start mb-4">
+                        
+                        <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <h3 class="font-bold text-lg text-slate-800 leading-tight">${data.nama}</h3>
-                                <p class="text-xs text-indigo-600 font-bold mt-1 uppercase tracking-wider">${formattedDate}</p>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Pilih Tanggal</label>
+                                <input type="date" id="inDate" onchange="syncDataFromSelection()" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
                             </div>
-                            <div class="bg-indigo-50 p-2 rounded-xl">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-indigo-600"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Jam</label>
+                                <input type="text" id="inTime" oninput="updatePreview()" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="19.00 WIB">
                             </div>
                         </div>
-                        <div class="space-y-3">
-                            ${linksHtml}
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-xs font-bold text-gray-500 uppercase">Link Utama</label>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-[10px] font-bold text-gray-400">AUTO</span>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" id="linkModeToggle" onchange="toggleLinkMode()" class="sr-only peer">
+                                        <div class="w-8 h-4 bg-blue-200 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-blue-600"></div>
+                                    </label>
+                                    <span class="text-[10px] font-bold text-gray-400">MANUAL</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <input type="text" id="inMain" oninput="updatePreview()" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none disabled:bg-gray-50 disabled:text-gray-400" placeholder="Link muncul otomatis...">
+                                <button id="btnNextLink" onclick="rotateLink()" class="bg-gray-100 hover:bg-gray-200 p-3 rounded-lg border border-gray-200 transition-colors">
+                                    🔄
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Sandi Replay</label>
+                            <input type="text" id="inPass" oninput="updatePreview()" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Sandi otomatis...">
                         </div>
                     </div>
-                `;
-                container.appendChild(card);
+                </div>
+            </div>
+
+            <!-- RIGHT COLUMN: PREVIEW -->
+            <div class="space-y-6">
+                <div class="glass-card rounded-2xl p-6 shadow-xl border-t-4 border-blue-600 sticky top-8">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">Preview Pesan</h3>
+                        <button 
+                            onclick="copyToClipboard()"
+                            id="copyBtn"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-bold transition-all flex items-center gap-2 shadow-lg"
+                        >
+                            Salin Format
+                        </button>
+                    </div>
+                    
+                    <div id="formattedOutput" class="bg-gray-50 p-4 rounded-xl border border-gray-200 text-sm whitespace-pre-wrap font-sans leading-relaxed text-gray-700 overflow-y-auto max-h-[550px]">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-10 left-1/2 transform -translate-x-1/2 bg-black text-white px-8 py-3 rounded-full text-sm font-bold opacity-0 transition-opacity pointer-events-none z-50 shadow-2xl">
+        Berhasil!
+    </div>
+
+    <script>
+        const STORAGE_KEY = "show_manager_v7_db";
+        const REPLAY_BASE_URL = "https://48realtime.github.io/Replay-Show/";
+        
+        let db = {}; // Format: { "ShowName|YYYY-MM-DD": { links: [], pass: "", time: "" } }
+        let isManualMode = false;
+
+        // Initialize App
+        window.onload = () => {
+            const saved = localStorage.getItem(STORAGE_KEY);
+            if (saved) db = JSON.parse(saved);
+            
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('adminDate').value = today;
+            document.getElementById('inDate').value = today;
+            
+            refreshDropdowns();
+            syncDataFromSelection();
+            toggleLinkMode();
+        };
+
+        // --- DATABASE OPERATIONS ---
+
+        function saveShowToDatabase() {
+            const name = document.getElementById('adminShow').value.trim();
+            const date = document.getElementById('adminDate').value;
+            const time = document.getElementById('adminTime').value.trim();
+            const pass = document.getElementById('adminPass').value.trim();
+            const rawLinks = document.getElementById('adminLinks').value;
+
+            if (!name || !date) { alert("Nama Show dan Tanggal wajib diisi!"); return; }
+
+            const key = `${name}|${date}`;
+            const links = rawLinks.split('\n').map(l => l.trim()).filter(l => l !== "");
+
+            // Merge or create entry
+            if (!db[key]) {
+                db[key] = { links: [], pass: "", time: "" };
+            }
+
+            if (links.length > 0) db[key].links = [...db[key].links, ...links];
+            if (pass) db[key].pass = pass;
+            if (time) db[key].time = time;
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+            
+            // UI Feedback
+            refreshDropdowns();
+            syncDataFromSelection();
+            showToast("Data Show disimpan!");
+            
+            // Clear admin inputs
+            document.getElementById('adminLinks').value = "";
+        }
+
+        function refreshDropdowns() {
+            const select = document.getElementById('inShow');
+            const currentVal = select.value;
+            const uniqueNames = new Set();
+            
+            // Add from DB
+            Object.keys(db).forEach(key => uniqueNames.add(key.split('|')[0]));
+            
+            // Standard Shows according to user request
+            const standardShows = [
+                "Seleksi PMDK", 
+                "JKT48 Shcool", 
+                "Andai Ku Bukan Idola", 
+                "Z Vs Alpha", 
+                "JKT48 Fight : Dream,PASSION,LOVE",
+                "Membership Show"
+            ];
+            standardShows.forEach(n => uniqueNames.add(n));
+
+            select.innerHTML = '<option value="">-- Pilih Show --</option>';
+            Array.from(uniqueNames).sort().forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name;
+                opt.textContent = name;
+                if(name === "Membership Show") opt.className = "opt-membership";
+                select.appendChild(opt);
+            });
+            select.value = currentVal;
+        }
+
+        function syncDataFromSelection() {
+            const name = document.getElementById('inShow').value;
+            const date = document.getElementById('inDate').value;
+            const key = `${name}|${date}`;
+            
+            const entry = db[key];
+            
+            if (entry) {
+                if (!isManualMode) {
+                    document.getElementById('inMain').value = entry.links.length > 0 ? entry.links[0] : "";
+                }
+                document.getElementById('inPass').value = entry.pass || "";
+                document.getElementById('inTime').value = entry.time || "19.00 WIB";
+            } else {
+                if (!isManualMode) document.getElementById('inMain').value = "";
+            }
+            
+            renderLinkList(entry ? entry.links : []);
+            updatePreview();
+        }
+
+        function renderLinkList(links) {
+            const container = document.getElementById('linkDatabaseView');
+            const counter = document.getElementById('linkCounter');
+            
+            container.innerHTML = "";
+            counter.innerText = `Sisa: ${links.length}`;
+
+            if (links.length === 0) {
+                container.innerHTML = "<p class='italic opacity-50 text-center py-4'>Belum ada link terdaftar</p>";
+                return;
+            }
+
+            links.forEach((link, i) => {
+                const div = document.createElement('div');
+                div.className = `p-1 truncate border-b border-gray-100 flex items-center gap-2 ${i === 0 ? 'text-blue-600 font-bold bg-blue-50' : 'text-gray-400'}`;
+                div.innerHTML = `<span class="bg-gray-200 text-gray-600 px-1 rounded text-[8px]">${i+1}</span> <span>${link}</span>`;
+                container.appendChild(div);
             });
         }
 
-        // Fungsi Salin Link
-        function copyLink(text) {
-            const temp = document.createElement('textarea');
-            temp.value = text;
-            document.body.appendChild(temp);
-            temp.select();
-            document.execCommand('copy');
-            document.body.removeChild(temp);
-            alert('Link berhasil disalin!');
+        // --- UI CONTROLS ---
+
+        function toggleLinkMode() {
+            isManualMode = document.getElementById('linkModeToggle').checked;
+            const input = document.getElementById('inMain');
+            const btn = document.getElementById('btnNextLink');
+            
+            input.disabled = !isManualMode;
+            if(isManualMode) {
+                btn.classList.add('opacity-30', 'pointer-events-none');
+            } else {
+                btn.classList.remove('opacity-30', 'pointer-events-none');
+                syncDataFromSelection();
+            }
         }
 
-        // Jalankan saat load
-        window.onload = loadDatabase;
+        function rotateLink() {
+            const name = document.getElementById('inShow').value;
+            const date = document.getElementById('inDate').value;
+            const key = `${name}|${date}`;
+
+            if (db[key] && db[key].links.length > 1) {
+                const first = db[key].links.shift();
+                db[key].links.push(first);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+                syncDataFromSelection();
+            }
+        }
+
+        function formatIndoDate(dateStr) {
+            if (!dateStr) return null;
+            const dateObj = new Date(dateStr);
+            const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            return `${String(dateObj.getDate()).padStart(2, '0')} ${months[dateObj.getMonth()]} ${dateObj.getFullYear()}`;
+        }
+
+        function updatePreview() {
+            const show = document.getElementById('inShow').value || "[NAMA SHOW]";
+            const rawDate = document.getElementById('inDate').value;
+            const date = formatIndoDate(rawDate) || "[TANGGAL]";
+            const time = document.getElementById('inTime').value || "19.00 WIB";
+            const link = document.getElementById('inMain').value || "[LINK TIDAK ADA]";
+            const pass = document.getElementById('inPass').value || "[SANDI]";
+
+            // Generate "Dibuat" timestamp
+            const now = new Date();
+            const timeString = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
+            const timestamp = `${formatIndoDate(now.toISOString().split('T')[0])} ${timeString}`;
+
+            let template = "";
+            // Special text for "Membership Show"
+            if (show === "Membership Show") {
+                template = `> ⚠️ *IMPORTANT:* _Jangan keluar masuk streaming karena di setiap akses memiliki token aktif yang dapat menyebabkan streaming kaka bisa invalid/tidak bisa ditonton! (HARAP DIBACA DAN DIPAHAMI)_
+
+🎭 Membership: Streaming Access
+📆 Durasi: 1 Bulan
+👥 Akses: Live Streaming + Replay (jika tersedia)
+📅 Dibuat: ${timestamp}
+
+🔗 Link Membership:
+ ${link}
+
+📥Link Grup : https://chat.whatsapp.com/IblSlhDwXyE3ecrZtioqcH
+
+📧 Link Replay : 
+1. https://48realtime.github.io/Replay-Show/
+2. https://replayshowstreaming.my.id/
+
+🗝️Kode Master Replay : ${pass}
+
+Selamat menikmati membership streaming, dan semoga pengalaman streaming ini berkesan! Jika ada kendala, jangan ragu untuk menghubungi kami. 🤗😆`;
+            } else {
+                // Default text for all other shows
+                template = `> *Show : ${show}*
+> *Akses tanggal : ${date} jam : ${time}*
+
+📢 *AKSES LIVE STREAMING pada LINK UTAMA Dan REPLAY* : 
+
+1️⃣ Link Utama: 🔗 ${link}
+
+🔗Replay ${date} : ${REPLAY_BASE_URL}
+🗝️ Sandi : ${pass}
+
+📧*Cara akses Live Chat* :
+  Hapus cache pada browser yang digunakan... 
+
+⚠️ *PENTING UNTUK DIPERHATIKAN*:
+1 Akun = 1 Device/browser : Jangan login di dua perangkat bersamaan.
+Waktu Akses: Disarankan masuk website saat live sudah dimulai (Cek info terbaru di saluran).
+Browser: Gunakan Chrome atau Opera untuk pengalaman terbaik.
+Kendala Akses: Jika tombol masuk tidak berfungsi, mohon matikan AdBlock/DNS AdGuard.
+
+Jika ada kendala, segera hubungi Admin. Selamat menonton! ✨`;
+            }
+            document.getElementById('formattedOutput').innerText = template;
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('formattedOutput').innerText;
+            const name = document.getElementById('inShow').value;
+            const date = document.getElementById('inDate').value;
+            const key = `${name}|${date}`;
+
+            if (!document.getElementById('inMain').value) {
+                alert("Link utama kosong!"); return;
+            }
+
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            if (!isManualMode && db[key] && db[key].links.length > 0) {
+                db[key].links.shift();
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+                syncDataFromSelection();
+                showToast("Disalin & Link Dipakai!");
+            } else {
+                showToast("Berhasil Disalin!");
+            }
+        }
+
+        function clearAllLinks() {
+            if(confirm("Hapus semua data show dan link dari database lokal?")) {
+                db = {};
+                localStorage.removeItem(STORAGE_KEY);
+                location.reload();
+            }
+        }
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.opacity = '1';
+            setTimeout(() => t.style.opacity = '0', 2500);
+        }
     </script>
 </body>
 </html>
