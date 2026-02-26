@@ -37,7 +37,7 @@
                             <input list="showList" id="adminShow" class="w-full p-2 text-sm border border-gray-200 rounded-lg outline-none bg-white" placeholder="Ketik atau pilih show...">
                             <datalist id="showList">
                                 <option value="Seleksi PMDK">
-                                <option value="JKT48 Shcool">
+                                <option value="JKT48 School">
                                 <option value="Andai Ku Bukan Idola">
                                 <option value="Z Vs Alpha">
                                 <option value="JKT48 Fight : Dream,PASSION,LOVE">
@@ -54,12 +54,18 @@
                                 <input type="text" id="adminTime" class="w-full p-2 text-sm border border-gray-200 rounded-lg outline-none bg-white" placeholder="19.00 WIB">
                             </div>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Sandi Replay</label>
-                            <input type="text" id="adminPass" class="w-full p-2 text-sm border border-gray-200 rounded-lg outline-none bg-white" placeholder="Sandi123">
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Sandi Replay</label>
+                                <input type="text" id="adminPass" class="w-full p-2 text-sm border border-gray-200 rounded-lg outline-none bg-white" placeholder="Sandi123">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Link Cadangan</label>
+                                <input type="text" id="adminBackup" class="w-full p-2 text-sm border border-gray-200 rounded-lg outline-none bg-white" placeholder="realtime48.my.id">
+                            </div>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Input Link (Baris Baru)</label>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Input Link Utama (Baris Baru)</label>
                             <textarea id="adminLinks" rows="4" class="w-full p-2 text-xs border border-gray-200 rounded-lg outline-none font-mono" placeholder="Paste link-link di sini..."></textarea>
                         </div>
                         <button 
@@ -139,9 +145,15 @@
                             </div>
                         </div>
 
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Sandi Replay</label>
-                            <input type="text" id="inPass" oninput="updatePreview()" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Sandi otomatis...">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Sandi Replay</label>
+                                <input type="text" id="inPass" oninput="updatePreview()" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Sandi otomatis...">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Link Cadangan</label>
+                                <input type="text" id="inBackup" oninput="updatePreview()" class="w-full p-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Link cadangan...">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -175,9 +187,9 @@
 
     <script>
         const STORAGE_KEY = "show_manager_v7_db";
-        const REPLAY_BASE_URL = "https://48realtime.github.io/Replay-Show/";
+        const REPLAY_BASE_URL = "https://realtime48.vercel.app/";
         
-        let db = {}; // Format: { "ShowName|YYYY-MM-DD": { links: [], pass: "", time: "" } }
+        let db = {}; // Format: { "ShowName|YYYY-MM-DD": { links: [], pass: "", time: "", backup: "" } }
         let isManualMode = false;
 
         // Initialize App
@@ -201,6 +213,7 @@
             const date = document.getElementById('adminDate').value;
             const time = document.getElementById('adminTime').value.trim();
             const pass = document.getElementById('adminPass').value.trim();
+            const backup = document.getElementById('adminBackup').value.trim();
             const rawLinks = document.getElementById('adminLinks').value;
 
             if (!name || !date) { alert("Nama Show dan Tanggal wajib diisi!"); return; }
@@ -210,12 +223,13 @@
 
             // Merge or create entry
             if (!db[key]) {
-                db[key] = { links: [], pass: "", time: "" };
+                db[key] = { links: [], pass: "", time: "", backup: "realtime48.my.id" };
             }
 
             if (links.length > 0) db[key].links = [...db[key].links, ...links];
             if (pass) db[key].pass = pass;
             if (time) db[key].time = time;
+            if (backup) db[key].backup = backup;
 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
             
@@ -236,10 +250,10 @@
             // Add from DB
             Object.keys(db).forEach(key => uniqueNames.add(key.split('|')[0]));
             
-            // Standard Shows according to user request
+            // Standard Shows
             const standardShows = [
                 "Seleksi PMDK", 
-                "JKT48 Shcool", 
+                "JKT48 School", 
                 "Andai Ku Bukan Idola", 
                 "Z Vs Alpha", 
                 "JKT48 Fight : Dream,PASSION,LOVE",
@@ -271,8 +285,10 @@
                 }
                 document.getElementById('inPass').value = entry.pass || "";
                 document.getElementById('inTime').value = entry.time || "19.00 WIB";
+                document.getElementById('inBackup').value = entry.backup || "realtime48.my.id";
             } else {
                 if (!isManualMode) document.getElementById('inMain').value = "";
+                document.getElementById('inBackup').value = "realtime48.my.id";
             }
             
             renderLinkList(entry ? entry.links : []);
@@ -342,14 +358,13 @@
             const time = document.getElementById('inTime').value || "19.00 WIB";
             const link = document.getElementById('inMain').value || "[LINK TIDAK ADA]";
             const pass = document.getElementById('inPass').value || "[SANDI]";
+            const backup = document.getElementById('inBackup').value || "realtime48.my.id";
 
-            // Generate "Dibuat" timestamp
             const now = new Date();
             const timeString = now.getHours().toString().padStart(2, '0') + ":" + now.getMinutes().toString().padStart(2, '0');
             const timestamp = `${formatIndoDate(now.toISOString().split('T')[0])} ${timeString}`;
 
             let template = "";
-            // Special text for "Membership Show"
             if (show === "Membership Show") {
                 template = `> ⚠️ *IMPORTANT:* _Jangan keluar masuk streaming karena di setiap akses memiliki token aktif yang dapat menyebabkan streaming kaka bisa invalid/tidak bisa ditonton! (HARAP DIBACA DAN DIPAHAMI)_
 
@@ -360,30 +375,33 @@
 
 🔗 Link Membership:
  ${link}
+                
+🚨 Link Candangan : ${backup}
 
 📥Link Grup : https://chat.whatsapp.com/IblSlhDwXyE3ecrZtioqcH
 
 📧 Link Replay : 
-1. https://48realtime.github.io/Replay-Show/
+1. https://https://realtime48.vercel.app//
 2. https://replayshowstreaming.my.id/
 
 🗝️Kode Master Replay : ${pass}
 
 Selamat menikmati membership streaming, dan semoga pengalaman streaming ini berkesan! Jika ada kendala, jangan ragu untuk menghubungi kami. 🤗😆`;
             } else {
-                // Default text for all other shows
                 template = `> *Show : ${show}*
 > *Akses tanggal : ${date} jam : ${time}*
 
-📢 *AKSES LIVE STREAMING pada LINK UTAMA Dan REPLAY* : 
+📢 *AKSES LIVE STREAMING pada LINK UTAMA,LINK CADANGAN Dan REPLAY* : 
 
-1️⃣ Link Utama: 🔗 ${link}
+* 1️⃣ *Link Utama*: 🔗 ${link}
+                
+* 2⃣ *Link Cadangan* : 🔗 ${backup}
 
 🔗Replay ${date} : ${REPLAY_BASE_URL}
 🗝️ Sandi : ${pass}
 
-📧*Cara akses Live Chat* :
-  Hapus cache pada browser yang digunakan... 
+📧*PENTINGGG🚨* :
+    *Gunakan link cadangan,jika link utama mengalami kendala pada saat live. Masuk link cadangan menggunakan Email yang telah didaftarkan!!!*
 
 ⚠️ *PENTING UNTUK DIPERHATIKAN*:
 1 Akun = 1 Device/browser : Jangan login di dua perangkat bersamaan.
